@@ -19,3 +19,15 @@ echo 'src-git passwall_app https://github.com/xiaorouji/openwrt-passwall.git' >>
 echo 'src-git helloworld https://github.com/fw876/helloworld.git' >>feeds.conf.default
 echo 'src-git poweroff https://github.com/akihara-sam/luci-app-poweroff.git' >>feeds.conf.default
 echo 'src-git openclash https://github.com/vernesong/OpenClash.git' >>feeds.conf.default
+
+# 删除旧的 Go 语言包
+rm -rf ./feeds/packages/lang/golang
+
+# 克隆指定版本的 Go 语言包
+git clone https://github.com/openwrt/packages.git -b master --single-branch --depth 1 temp_packages
+
+# 仅复制golang目录
+cp -R temp_packages/lang/golang ./feeds/packages/lang/
+
+# 清理临时文件
+rm -rf temp_packages
