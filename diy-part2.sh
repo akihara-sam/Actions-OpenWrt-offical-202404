@@ -18,3 +18,16 @@
 
 # Modify hostname
 #sed -i 's/OpenWrt/P3TERX-Router/g' package/base-files/files/bin/config_generate
+
+
+# 删除旧的 Go 语言包
+rm -rf ./feeds/packages/lang/golang
+
+# 克隆指定版本的 Go 语言包
+git clone https://github.com/openwrt/packages.git -b master --single-branch --depth 1 temp_packages
+
+# 仅复制golang目录
+cp -R temp_packages/lang/golang ./feeds/packages/lang/
+
+# 清理临时文件
+rm -rf temp_packages
