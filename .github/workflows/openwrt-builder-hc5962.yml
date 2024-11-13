@@ -9,6 +9,12 @@
 # This is free software, licensed under the MIT License.
 # See /LICENSE for more information.
 #
+# REPO_TAG: 20230609
+# git clone $REPO_URL -b $REPO_TAG openwrt
+#
+# REPO_BRANCH: master
+# git clone $REPO_URL -b $REPO_BRANCH openwrt
+#
 
 name: openwrt-builder-hc5962
 
@@ -18,7 +24,7 @@ on:
 
 env:
   REPO_URL: https://github.com/openwrt/openwrt
-  REPO_TAG: v23.05.5
+  REPO_BRANCH: openwrt-24.10
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: hc5962+.config
   DIY_P1_SH: diy-part1.sh
@@ -55,7 +61,7 @@ jobs:
       working-directory: /workdir
       run: |
         df -hT $PWD
-        git clone $REPO_URL -b $REPO_TAG openwrt
+        git clone $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
     - name: Load custom feeds
