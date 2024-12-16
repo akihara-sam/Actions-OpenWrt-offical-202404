@@ -63,7 +63,7 @@ jobs:
         echo "status=success" >> $GITHUB_OUTPUT
 
     - name: 上传插件构建产物
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       if: steps.build.outputs.status == 'success'
       with:
         name: pppwn-cpp 插件
