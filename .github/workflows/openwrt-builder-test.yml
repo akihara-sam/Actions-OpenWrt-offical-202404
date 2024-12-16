@@ -1,6 +1,7 @@
 name: Build pppwn-cpp 插件
 
 on:
+  repository_dispatch:
   workflow_dispatch:
 
 env:
