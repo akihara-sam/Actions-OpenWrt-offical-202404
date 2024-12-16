@@ -1,0 +1,70 @@
+name: Build pppwn-cpp 插件
+
+on:
+  workflow_dispatch:
+
+env:
+  REPO_URL: https://github.com/openwrt/openwrt
+  REPO_BRANCH: openwrt-24.10  # 根据需要调整分支
+  FEEDS_CONF: feeds.conf.default
+  CONFIG_FILE: x86-2.config  # 根据需要调整配置文件
+  DIY_P1_SH: diy-part1.sh
+  DIY_P2_SH: diy-part2.sh
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout OpenWrt 源代码
+      uses: actions/checkout@v2
+
+    - name: 初始化构建环境
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+        sudo docker image prune --all --force
+        sudo apt-get update -qq
+        sudo apt-get install -y build-essential git ccache curl libncurses5-dev libssl-dev libxml-parser-perl unzip
+
+    - name: 克隆 OpenWrt 源代码
+      working-directory: /workdir
+      run: |
+        git clone $REPO_URL -b $REPO_BRANCH openwrt
+        ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+
+    - name: 加载自定义 feeds
+      run: |
+        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
+        chmod +x $DIY_P1_SH
+        cd openwrt
+        $GITHUB_WORKSPACE/$DIY_P1_SH
+
+    - name: 更新 feeds
+      run: cd openwrt && ./scripts/feeds update -a
+
+    - name: 安装 feeds
+      run: cd openwrt && ./scripts/feeds install -a
+
+    - name: 配置 OpenWrt
+      run: |
+        [ -e files ] && mv files openwrt/files
+        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
+        chmod +x $DIY_P2_SH
+        cd openwrt
+        $GITHUB_WORKSPACE/$DIY_P2_SH
+
+    - name: 构建 pppwn-cpp 插件
+      run: |
+        cd openwrt
+        make package/feeds/sam_luci_app/pppwn-cpp/compile -j$(nproc) V=s
+        echo "status=success" >> $GITHUB_OUTPUT
+
+    - name: 上传插件构建产物
+      uses: actions/upload-artifact@v2
+      if: steps.build.outputs.status == 'success'
+      with:
+        name: pppwn-cpp 插件
+        path: openwrt/bin/packages/x86_64/base/pppwn-cpp*.ipk
