@@ -62,6 +62,18 @@ jobs:
         chmod +x $DIY_P2_SH
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P2_SH
+        
+    - name: 清理先前的构建缓存
+      run: |
+        cd openwrt
+        make clean
+        make dirclean
+
+    - name: 构建工具链
+      run: |
+        cd openwrt
+        make tools/compile V=s
+        
 
     - name: 构建 pppwn-cpp 插件
       run: |
