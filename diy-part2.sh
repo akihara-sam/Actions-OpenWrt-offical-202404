@@ -11,7 +11,12 @@
 #
 
 # Modify default IP
- sed -i 's/192.168.1.1/192.168.50.206/g' package/base-files/files/bin/config_generate
+sed -i 's/192.168.1.1/192.168.50.206/g' package/base-files/files/bin/config_generate
+
+# Modify timezone to Asia/Shanghai
+sed -i "s/utc/cst-8/g" package/base-files/files/bin/config_generate
+sed -i "s/UTC/Asia\/Shanghai/g" package/base-files/files/bin/config_generate
+
 
 # Modify default theme
 #sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci/Makefile
